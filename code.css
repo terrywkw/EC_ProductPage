@@ -137,14 +137,23 @@ textarea {
 
 /* Image Preview Area */
 .image-preview-area {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 10px;
-    border: 1px dashed #ccc;
-    padding: 15px;
-    min-height: 100px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.image-preview-area img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
     border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.image-preview-area img:hover {
+    transform: scale(1.05);
 }
 
 .img-thumbnail-container {
@@ -192,115 +201,137 @@ textarea {
 
 /* Modal Styles */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
-    padding-top: 60px; /* Location of the box */
-    animation: fadeIn 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 5% auto;
-    padding: 30px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px; /* Limit max width */
+    background-color: #fff;
+    margin: 2% auto;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+}
+
+/* Image Generation Modal Specific Styles */
+#image-generate-modal .modal-content {
+    max-width: 900px;
+    padding: 2.5rem;
+}
+
+#image-generate-modal h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+#image-generate-modal p {
+    margin-bottom: 1.5rem;
+    color: #666;
+}
+
+#image-prompt {
+    width: 100%;
+    min-height: 120px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    position: relative;
-    animation: slideIn 0.3s ease;
-    max-height: 80vh; /* Limit height to prevent overflow */
-    overflow-y: auto; /* Allow scrolling if content is too tall */
+    font-size: 1rem;
+    resize: vertical;
 }
 
-.image-modal-content {
-     max-width: 800px; /* Wider for image editing */
-}
-
-.close-button {
-    color: #aaa;
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close-button:hover,
-.close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-/* AI Desc Modal Specific */
-#ai-prompt, #image-prompt {
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
 .ai-options {
-    margin-bottom: 15px;
-}
-.ai-options label {
-    display: inline-block;
-    margin-right: 10px;
-    font-weight: normal;
-}
-
-/* AI Result Areas */
-.ai-result-area, .image-results-area {
-    margin-top: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    padding: 15px;
-    border-radius: 4px;
-    min-height: 80px;
-    max-height: 300px; /* Limit height */
-    overflow-y: auto; /* Add scrollbar when needed */
-}
-.ai-result-area .placeholder, .image-results-area .placeholder {
-    color: #aaa;
-    font-style: italic;
-}
-
-/* Generated Images Grid */
-.generated-images-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-top: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
 
-.generated-image-container {
-    position: relative;
-    border: 2px solid transparent;
-    border-radius: 4px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.ai-options select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fff;
+    font-size: 0.95rem;
 }
 
-.generated-image-container:hover {
-    border-color: #3498db;
-    transform: scale(1.02);
+#generate-images-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
 }
 
-.generated-image-container.selected {
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+.image-results-area {
+    min-height: 300px;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .generated-image {
-    width: 100%;
-    height: auto;
-    display: block;
+    max-width: 100%;
+    max-height: 500px;
     object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#use-image-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+/* Loading and Error States */
+.image-results-area .loading {
+    color: #666;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.image-results-area .error {
+    color: #dc3545;
+    font-weight: bold;
+    text-align: center;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        padding: 1.5rem;
+    }
+
+    .ai-options {
+        grid-template-columns: 1fr;
+    }
+
+    .image-results-area {
+        min-height: 250px;
+    }
 }
 
 /* API Key Modal Specific */
@@ -335,25 +366,18 @@ textarea {
 }
 .modal-image-background {
     width: 100%;
-    height: 300px; /* Adjust as needed */
-    border: 1px dashed #ccc;
-    margin-top: 10px;
+    height: 300px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #eee; /* Default background */
-    background-size: cover;
-    background-position: center;
-    border-radius: 4px;
-    overflow: hidden; /* Keep image contained */
+    overflow: hidden;
 }
-#modal-image-preview {
+.modal-image-background img {
     max-width: 100%;
     max-height: 100%;
-    display: block;
-    /* Simulating removed background (won't work perfectly on non-transparent source images) */
-    mix-blend-mode: multiply; /* Simple effect, change if needed */
-     /* For real transparency, the source image *must* be transparent */
+    object-fit: contain;
 }
 .background-options {
     display: flex;
@@ -509,9 +533,21 @@ textarea {
 
 /* AI Image Generation Enhanced Styles */
 .image-results-area {
-    margin-top: 20px;
-    min-height: 250px !important;
-    max-height: 500px !important;
+    margin: 1rem 0;
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-results-area .loading {
+    color: #666;
+    font-style: italic;
+}
+
+.image-results-area .error {
+    color: #dc3545;
+    font-weight: bold;
 }
 
 .api-key-section {
@@ -543,25 +579,6 @@ textarea {
 
 .text-gray-500 {
     color: #718096;
-}
-
-.image-results-area .error {
-    color: #e74c3c;
-    padding: 10px;
-    background-color: #ffeaea;
-    border-radius: 4px;
-    width: 100%;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.image-results-area img.generated-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 6px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin: 10px 0;
-    display: block;
 }
 
 .image-results-area .generated-text {

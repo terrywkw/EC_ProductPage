@@ -319,3 +319,74 @@ class TextToImageUI {
 
 // Export the UI handler
 window.TextToImageUI = TextToImageUI;
+
+// Text to Image UI Handler
+document.addEventListener('DOMContentLoaded', function() {
+    const generateButton = document.getElementById('generate-images-button');
+    const useImageButton = document.getElementById('use-image-button');
+    const imageResultsArea = document.getElementById('image-results-area');
+    const imagePrompt = document.getElementById('image-prompt');
+    const imageStyle = document.getElementById('image-style');
+    const backgroundStyle = document.getElementById('background-style');
+    const aspectRatio = document.getElementById('aspect-ratio');
+
+    generateButton.addEventListener('click', async function() {
+        try {
+            // Show loading state
+            imageResultsArea.innerHTML = '<p class="loading">正在生成圖片，請稍候...</p>';
+            generateButton.disabled = true;
+
+            // Get input values
+            const prompt = imagePrompt.value;
+            const style = imageStyle.value;
+            const background = backgroundStyle.value;
+            const ratio = aspectRatio.value;
+
+            if (!prompt) {
+                throw new Error('請輸入圖片描述');
+            }
+
+            // Generate image using Gemini service
+            const result = await window.geminiImageService.generateImage(prompt, style, background, ratio);
+
+            // Display the generated image
+            if (result.imageData) {
+                const img = document.createElement('img');
+                img.src = `data:image/png;base64,${result.imageData}`;
+                img.alt = 'Generated Product Image';
+                img.className = 'generated-image';
+
+                imageResultsArea.innerHTML = '';
+                imageResultsArea.appendChild(img);
+
+                // Show the use button
+                useImageButton.style.display = 'block';
+            } else {
+                throw new Error('未能生成圖片');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            imageResultsArea.innerHTML = `<p class="error">錯誤: ${error.message}</p>`;
+        } finally {
+            generateButton.disabled = false;
+        }
+    });
+
+    useImageButton.addEventListener('click', function() {
+        const generatedImage = imageResultsArea.querySelector('img');
+        if (generatedImage) {
+            // Create a new image element for the preview area
+            const newImage = document.createElement('img');
+            newImage.src = generatedImage.src;
+            newImage.alt = 'Generated Product Image';
+
+            // Add to the image preview area
+            const previewArea = document.getElementById('image-preview-area');
+            previewArea.appendChild(newImage);
+
+            // Close the modal
+            const modal = document.getElementById('image-generate-modal');
+            modal.style.display = 'none';
+        }
+    });
+});
