@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增商品 - AI 輔助</title>
+    <link rel="stylesheet" href="code.css">
+    <script src="gemini_image_service.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="icon">📦</span> 新增商品</h1>
+
+        <div class="actions-top">
+            <button class="btn btn-secondary">儲存草稿</button>
+            <button class="btn btn-secondary">預覽</button>
+            <button class="btn btn-primary">發佈商品</button>
+        </div>
+
+        <div class="form-layout">
+            <!-- Left Panel: Core Info -->
+            <div class="form-panel left-panel">
+                <h2>商品資訊</h2>
+
+                <div class="form-group">
+                    <label for="product-name">商品名稱 <span class="required">*</span></label>
+                    <input type="text" id="product-name" name="product-name" placeholder="請輸入商品名稱" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-description">商品描述</label>
+                    <div class="ai-feature">
+                        <button id="ai-desc-button" class="btn btn-ai">
+                            <span class="icon">✨</span> AI 生成 200 字以內產品描述
+                        </button>
+                    </div>
+                    <textarea id="product-description" name="product-description" rows="10" placeholder="請輸入商品描述或使用 AI 生成"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-price">價格 <span class="required">*</span></label>
+                    <input type="number" id="product-price" name="product-price" placeholder="請輸入商品價格" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-stock">庫存 <span class="required">*</span></label>
+                    <input type="number" id="product-stock" name="product-stock" placeholder="請輸入商品庫存" required>
+                </div>
+                
+            </div>
+
+            <!-- Right Panel: Images, Category, etc. -->
+            <div class="form-panel right-panel">
+                <h2>商品圖片</h2>
+                <div class="form-group">
+                    <div class="ai-feature">
+                        <button id="ai-image-generate-button" class="btn btn-ai">
+                            <span class="icon">✨</span> AI 生成產品圖片
+                        </button>
+                    </div>
+                    <label for="product-images">上傳圖片 (可多選)</label>
+                    <input type="file" id="product-images" name="product-images" accept="image/*" multiple>
+                    <div id="image-preview-area" class="image-preview-area">
+                        <!-- Image previews will be added here by JS -->
+                    </div>
+                </div>
+
+                <h2>分類與標籤</h2>
+                 <div class="form-group">
+                    <label for="product-category">商品分類</label>
+                    <select id="product-category" name="product-category">
+                        <option value="">請選擇</option>
+                        <option value="cat1">分類一</option>
+                        <option value="cat2">分類二</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="product-tags">商品標籤 (逗號分隔)</label>
+                    <input type="text" id="product-tags" name="product-tags" placeholder="例如：冬季,限量,質感">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Description Modal -->
+    <div id="ai-desc-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-desc-modal">&times;</span>
+            <h2><span class="icon">✨</span> AI 產品敘述生成器 (200字以內)</h2>
+            <p>請描述你的產品，提供越多細節越好 (例如：特色、材質、功能、目標客群)。</p>
+            <textarea id="ai-prompt" rows="5" placeholder="例：一款適合戶外運動的防水藍牙耳機，輕巧、電力持久，內建高品質揚聲器..."></textarea>
+            <div class="ai-options">
+                 <label for="ai-tone">語氣風格:</label>
+                 <select id="ai-tone">
+                    <option value="professional">專業</option>
+                    <option value="playful">活潑</option>
+                    <option value="concise">簡潔</option>
+                 </select>
+            </div>
+            <button id="generate-desc-button" class="btn btn-primary">開始生成</button>
+            <div id="ai-result-area" class="ai-result-area">
+                <!-- AI generated text will appear here -->
+                <p class="placeholder">AI 生成的結果將顯示於此...</p>
+            </div>
+            <button id="use-desc-button" class="btn btn-secondary" style="display: none;">使用此敘述</button>
+        </div>
+    </div>
+
+    <!-- AI Image Edit Modal -->
+    <div id="ai-image-modal" class="modal">
+        <div class="modal-content image-modal-content">
+            <span class="close-button" id="close-image-modal">&times;</span>
+            <h2><span class="icon">🪄</span> AI 商品照編輯</h2>
+            <div class="image-edit-layout">
+                <div class="image-preview-container">
+                    <p><strong>預覽:</strong></p>
+                    <div id="modal-image-background" class="modal-image-background">
+                         <img id="modal-image-preview" src="#" alt="Image Preview">
+                    </div>
+                 </div>
+                 <div class="image-edit-controls">
+                    <p><strong>1. 自動去背 (已模擬完成)</strong></p>
+                    <p><strong>2. 選擇背景:</strong></p>
+                    <div class="background-options">
+                        <button class="bg-option" data-bg="white">純白</button>
+                        <button class="bg-option" data-bg="lightgray">淺灰</button>
+                        <button class="bg-option" data-bg="#e0f7fa">淺藍</button>
+                        <button class="bg-option" data-bg="url('https://via.placeholder.com/150/771796')">場景1</button> 
+                        <button class="bg-option" data-bg="url('https://via.placeholder.com/150/d32776')">場景2</button> 
+                        <button class="bg-option" data-bg="transparent">透明</button> 
+                    </div>
+                    <button id="save-image-button" class="btn btn-primary">儲存為新圖片</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Image Generation Modal -->
+    <div id="image-generate-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-image-generate-modal">&times;</span>
+            <h2><span class="icon">✨</span> AI 產品圖片生成器</h2>
+            <p>請描述您想要生成的產品圖片，提供越多細節越好。</p>
+            <textarea id="image-prompt" rows="4" placeholder="例：一款紫色的真無線藍牙耳機，適合運動時使用，防水設計..."></textarea>
+            <div class="ai-options">
+                <div class="ai-options">
+                    <label for="image-style">圖片風格:</label>
+                    <select id="image-style">
+                        <option value="product-photography">產品攝影</option>
+                        <option value="lifestyle">生活情境</option>
+                        <option value="minimalist">簡約風格</option>
+                        <option value="artistic">藝術風格</option>
+                        <option value="technical">技術展示</option>
+                    </select>
+                </div>
+                <div class="ai-options">
+                    <label for="background-style">背景風格:</label>
+                    <select id="background-style">
+                        <option value="white">純白背景</option>
+                        <option value="gradient">漸層背景</option>
+                        <option value="contextual">情境背景</option>
+                        <option value="studio">攝影棚</option>
+                    </select>
+                </div>
+                <div class="ai-options">
+                    <label for="aspect-ratio">長寬比:</label>
+                    <select id="aspect-ratio">
+                        <option value="1:1">1:1 (正方形)</option>
+                        <option value="4:3">4:3 (標準)</option>
+                        <option value="3:4">3:4 (直式)</option>
+                        <option value="16:9">16:9 (寬屏)</option>
+                        <option value="9:16">9:16 (手機屏幕)</option>
+                    </select>
+                </div>
+            </div>
+            <button id="generate-images-button" class="btn btn-primary">開始生成</button>
+            <div id="image-results-area" class="image-results-area">
+                <!-- AI generated images will appear here -->
+                <p class="placeholder">生成的圖片將顯示於此...</p>
+            </div>
+            <button id="use-image-button" class="btn btn-secondary" style="display: none;">使用此圖片</button>
+        </div>
+    </div>
+
+    <!-- API Key Management Modal -->
+    <div id="api-key-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-api-key-modal">&times;</span>
+            <h2><span class="icon">🔑</span> 設定 Google Gemini API Key</h2>
+            <p>請輸入您的 Google Gemini API Key 以使用 AI 功能。<br>
+               您可以從 <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> 獲取免費的 API Key。</p>
+            <div class="form-group">
+                <label for="api-key-input">API Key</label>
+                <input type="password" id="api-key-input" placeholder="AIza...">
+            </div>
+            <button id="save-api-key-button" class="btn btn-primary">儲存</button>
+            <p id="api-key-status" class="text-sm mt-2"></p>
+        </div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="encoding_fix.js"></script>
+    <script src="gemini_service.js"></script>
+    <script src="imagen_service.js"></script>
+    <script src="image_to_text_service.js"></script>
+    <script src="text_to_image_service.js"></script>
+    <script src="api_key_manager.js"></script>
+    <script src="imagen_ui.js"></script>
+    <script src="image_to_text_ui.js"></script>
+    <script src="text_to_image_ui.js"></script>
+    <script src="encoding_test.js"></script>
+    <script src="gemini_image_service_v4.js"></script>
+    <script src="code.js"></script>
+</body>
+</html>

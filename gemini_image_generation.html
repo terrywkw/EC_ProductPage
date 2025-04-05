@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 2.0 文生圖</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .prompt-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        .generate-button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .generate-button:hover {
+            background-color: #3367d6;
+        }
+        .generate-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result-container {
+            margin-top: 20px;
+        }
+        .generated-image {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .generated-text {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .error-message {
+            color: #d93025;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fce8e6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gemini 2.0 文生圖</h1>
+        <div id="api-key-banner"></div>
+        <textarea id="prompt-input" class="prompt-input" placeholder="請輸入您想要生成的圖像描述..."></textarea>
+        <button id="generate-button" class="generate-button" disabled>生成圖像</button>
+        <div id="loading" class="loading">生成中...</div>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="result-container" class="result-container">
+            <div id="generated-text" class="generated-text"></div>
+            <img id="generated-image" class="generated-image" style="display: none;">
+        </div>
+    </div>
+
+    <script src="api_key_manager.js"></script>
+    <script src="gemini_image_generation_service.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const apiKeyManager = new ApiKeyManager();
+            const promptInput = document.getElementById('prompt-input');
+            const generateButton = document.getElementById('generate-button');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+            const generatedText = document.getElementById('generated-text');
+            const generatedImage = document.getElementById('generated-image');
+            const apiKeyBanner = document.getElementById('api-key-banner');
+
+            // Check for API key and show banner if needed
+            if (!apiKeyManager.hasApiKey()) {
+                apiKeyBanner.appendChild(apiKeyManager.createApiKeyBanner());
+            } else {
+                generateButton.disabled = false;
+            }
+
+            // Listen for API key updates
+            document.addEventListener('apiKeyUpdated', () => {
+                generateButton.disabled = false;
+                if (apiKeyBanner.firstChild) {
+                    apiKeyBanner.removeChild(apiKeyBanner.firstChild);
+                }
+            });
+
+            generateButton.addEventListener('click', async () => {
+                const prompt = promptInput.value.trim();
+                if (!prompt) {
+                    showError('請輸入圖像描述');
+                    return;
+                }
+
+                try {
+                    loading.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    generatedImage.style.display = 'none';
+                    generatedText.textContent = '';
+
+                    const apiKey = apiKeyManager.getApiKey();
+                    const service = new GeminiImageGenerationService(apiKey);
+                    const result = await service.generateImage(prompt);
+
+                    if (result.text) {
+                        generatedText.textContent = result.text;
+                    }
+
+                    if (result.imageData) {
+                        generatedImage.src = `data:image/png;base64,${result.imageData}`;
+                        generatedImage.style.display = 'block';
+                    }
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    loading.style.display = 'none';
+                }
+            });
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 

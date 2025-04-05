@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文編碼測試</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .test-container {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .test-case {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>中文字符編碼測試頁面</h1>
+    <p>這個頁面用於測試中文字符的顯示是否正常</p>
+
+    <div class="test-container">
+        <div class="test-title">靜態 HTML 中的中文</div>
+        <div class="test-case">
+            測試文字：這是直接寫在 HTML 檔案中的中文文字
+        </div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-title">JavaScript 生成的中文</div>
+        <div class="test-case" id="js-generated-text">
+            <!-- JavaScript 將在這裡生成中文文字 -->
+        </div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-title">標籤測試</div>
+        <div class="test-case" id="label-test">
+            <!-- 標籤測試區域 -->
+        </div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-title">表單元素測試</div>
+        <div class="test-case">
+            <div style="margin-bottom: 10px;">
+                <label for="test-input">輸入框 (Input):</label>
+                <input type="text" id="test-input" placeholder="請輸入測試文字">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="test-select">下拉選單 (Select):</label>
+                <select id="test-select">
+                    <option value="">請選擇</option>
+                    <option value="1">選項一</option>
+                    <option value="2">選項二</option>
+                    <option value="3">選項三</option>
+                </select>
+            </div>
+            <div>
+                <label for="test-textarea">文字區域 (Textarea):</label>
+                <textarea id="test-textarea" placeholder="請輸入多行測試文字" rows="3"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <div class="test-title">動態載入測試</div>
+        <button id="load-test-btn" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            載入中文資料
+        </button>
+        <div class="test-case" id="dynamic-content">
+            <!-- 動態載入的內容將顯示在這裡 -->
+        </div>
+    </div>
+
+    <script>
+        // 測試 JavaScript 生成的中文文字
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生成中文文字
+            document.getElementById('js-generated-text').textContent = 
+                "這是由 JavaScript 動態生成的中文文字";
+            
+            // 標籤測試
+            const labels = {
+                product: "商品",
+                category: "分類",
+                price: "價格",
+                stock: "庫存",
+                description: "描述",
+                upload: "上傳",
+                generate: "生成",
+                save: "儲存",
+                preview: "預覽",
+                aspectRatio: "長寬比"
+            };
+            
+            const labelTestElem = document.getElementById('label-test');
+            const labelHtml = Object.entries(labels).map(([key, value]) => 
+                `<div><strong>${key}:</strong> ${value}</div>`
+            ).join('');
+            
+            labelTestElem.innerHTML = labelHtml;
+            
+            // 動態載入測試
+            document.getElementById('load-test-btn').addEventListener('click', function() {
+                const dynamicContent = document.getElementById('dynamic-content');
+                dynamicContent.innerHTML = `
+                    <div style="margin-top: 10px;">
+                        <p>這是動態載入的中文內容</p>
+                        <ul>
+                            <li>項目一：測試中文顯示</li>
+                            <li>項目二：檢查是否有亂碼</li>
+                            <li>項目三：確認各項功能正常</li>
+                        </ul>
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
